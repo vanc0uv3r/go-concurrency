@@ -1,4 +1,4 @@
-package syntax
+package engine
 
 import (
 	"errors"
@@ -18,7 +18,6 @@ type CommandDesc struct {
 	args    []string
 }
 
-
 type Set struct{ CommandDesc }
 
 type Get struct{ CommandDesc }
@@ -30,10 +29,10 @@ func (s *Set) execute() (string, error) {
 	storage[args[0]] = args[1]
 	return args[1], nil
 }
-func (s *Set) getName() string { return s.name}
-func (s *Set) getArgsNumber() int { return s.argsNum}
-func (s *Set) getArgs() []string      { return s.args }
-func (s *Set) setArgs(args []string)  { s.args = args }
+func (s *Set) getName() string       { return s.name }
+func (s *Set) getArgsNumber() int    { return s.argsNum }
+func (s *Set) getArgs() []string     { return s.args }
+func (s *Set) setArgs(args []string) { s.args = args }
 
 func (g *Get) execute() (string, error) {
 	key := g.getArgs()[0]
@@ -44,8 +43,8 @@ func (g *Get) execute() (string, error) {
 
 	return "", errors.New(keyNotExistsErr)
 }
-func (g *Get) getName() string       { return g.name}
-func (g *Get) getArgsNumber() int    { return g.argsNum}
+func (g *Get) getName() string       { return g.name }
+func (g *Get) getArgsNumber() int    { return g.argsNum }
 func (g *Get) getArgs() []string     { return g.args }
 func (g *Get) setArgs(args []string) { g.args = args }
 
@@ -59,10 +58,10 @@ func (d *Del) execute() (string, error) {
 
 	return "", errors.New(keyNotExistsErr)
 }
-func (d *Del) getName() string { return d.name}
-func (d *Del) getArgsNumber() int { return d.argsNum}
-func (d *Del) getArgs() []string      { return d.args }
-func (d *Del) setArgs(args []string)  { d.args = args }
+func (d *Del) getName() string       { return d.name }
+func (d *Del) getArgsNumber() int    { return d.argsNum }
+func (d *Del) getArgs() []string     { return d.args }
+func (d *Del) setArgs(args []string) { d.args = args }
 
 var (
 	commands []Command
@@ -71,10 +70,10 @@ var (
 
 func init() {
 	commands = []Command{
-						&Set{CommandDesc: CommandDesc{name: "SET", argsNum: 2, args: make([]string, 0)}},
-						&Get{CommandDesc: CommandDesc{name: "GET", argsNum: 1, args: make([]string, 0)}},
-						&Del{CommandDesc: CommandDesc{name: "DEL", argsNum: 1, args: make([]string, 0)}},
-					}
+		&Set{CommandDesc: CommandDesc{name: "SET", argsNum: 2, args: make([]string, 0)}},
+		&Get{CommandDesc: CommandDesc{name: "GET", argsNum: 1, args: make([]string, 0)}},
+		&Del{CommandDesc: CommandDesc{name: "DEL", argsNum: 1, args: make([]string, 0)}},
+	}
 	storage = make(map[string]string)
 }
 
@@ -92,8 +91,8 @@ func NewEngine() *Engine {
 	}
 }
 
-func (e *Engine) SetLexemes(lexemes []string)  {e.lexemes = lexemes}
-func (e *Engine) GetCommandName() string {return e.command.getName()}
+func (e *Engine) SetLexemes(lexemes []string) { e.lexemes = lexemes }
+func (e *Engine) GetCommandName() string      { return e.command.getName() }
 
 func (e *Engine) Execute() (string, error) {
 	if len(e.lexemes) == 0 {
@@ -113,7 +112,7 @@ func (e *Engine) Execute() (string, error) {
 	return command.execute()
 }
 
-func (e *Engine) findCommand() (Command, error){
+func (e *Engine) findCommand() (Command, error) {
 	cmdToFound := e.lexemes[0]
 	for _, command := range commands {
 		if e.checkCommandName(cmdToFound, command) {
@@ -131,6 +130,5 @@ func (e *Engine) checkCommandName(cmdToFound string, command Command) bool {
 
 func (e *Engine) checkCommandArgs(command Command) bool {
 	argsNum := command.getArgsNumber()
- 	return argsNum == len(e.lexemes) - 1
+	return argsNum == len(e.lexemes)-1
 }
-
