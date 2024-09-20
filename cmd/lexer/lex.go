@@ -94,3 +94,10 @@ func (l *Lex) GetLexemes() []string {
 func (l *Lex) getStateMaker() worker {
 	return stateTable[l.current_state][l.new_state]
 }
+
+func (l *Lex) ClearLexer() {
+	l.buffer = bytes.Buffer{}
+	l.current_state = none
+	l.new_state = none
+	l.lexeme_list = l.lexeme_list[:0]
+}
