@@ -6,13 +6,13 @@ import (
 	"os"
 
 	"github.com/vanc0uv3r/go-concurrency/cmd/lexer"
-	"github.com/vanc0uv3r/go-concurrency/cmd/syntax"
+	"github.com/vanc0uv3r/go-concurrency/cmd/engine"
 )
 
 func main() {
 	reader := bufio.NewReader(os.Stdin)
 	lex := lexer.NewLex()
-	engine := syntax.NewEngine()
+	engine := engine.NewEngine()
 	for {
 		line, _, err := reader.ReadLine()
 		if err != nil {
@@ -22,7 +22,7 @@ func main() {
 		lex.Analyze(line)
 		engine.SetLexemes(lex.GetLexemes())
 		res, err := engine.Execute()
-		
+
 		if err != nil {
 			fmt.Println(err.Error())
 		} else {
