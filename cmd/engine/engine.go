@@ -24,15 +24,24 @@ type Get struct{ CommandDesc }
 
 type Del struct{ CommandDesc }
 
-func (s *Set) execute() (string, error) {
-	args := s.getArgs()
-	storage[args[0]] = args[1]
-	return args[1], nil
-}
+
 func (s *Set) getName() string       { return s.name }
 func (s *Set) getArgsNumber() int    { return s.argsNum }
 func (s *Set) getArgs() []string     { return s.args }
 func (s *Set) setArgs(args []string) { s.args = args }
+
+func (s *Set) execute() (string, error) {
+	args := s.getArgs()
+	key, val := args[0], args[1]
+	storage[key] = val
+	return val, nil
+}
+
+
+func (g *Get) getName() string       { return g.name }
+func (g *Get) getArgsNumber() int    { return g.argsNum }
+func (g *Get) getArgs() []string     { return g.args }
+func (g *Get) setArgs(args []string) { g.args = args }
 
 func (g *Get) execute() (string, error) {
 	key := g.getArgs()[0]
@@ -43,10 +52,11 @@ func (g *Get) execute() (string, error) {
 
 	return "", errors.New(keyNotExistsErr)
 }
-func (g *Get) getName() string       { return g.name }
-func (g *Get) getArgsNumber() int    { return g.argsNum }
-func (g *Get) getArgs() []string     { return g.args }
-func (g *Get) setArgs(args []string) { g.args = args }
+
+func (d *Del) getName() string       { return d.name }
+func (d *Del) getArgsNumber() int    { return d.argsNum }
+func (d *Del) getArgs() []string     { return d.args }
+func (d *Del) setArgs(args []string) { d.args = args }
 
 func (d *Del) execute() (string, error) {
 	key := d.getArgs()[0]
@@ -58,10 +68,6 @@ func (d *Del) execute() (string, error) {
 
 	return "", errors.New(keyNotExistsErr)
 }
-func (d *Del) getName() string       { return d.name }
-func (d *Del) getArgsNumber() int    { return d.argsNum }
-func (d *Del) getArgs() []string     { return d.args }
-func (d *Del) setArgs(args []string) { d.args = args }
 
 var (
 	commands []Command
@@ -95,9 +101,6 @@ func (e *Engine) SetLexemes(lexemes []string) { e.lexemes = lexemes }
 func (e *Engine) GetCommandName() string      { return e.command.getName() }
 
 func (e *Engine) Execute() (string, error) {
-	if len(e.lexemes) == 0 {
-		return "", errors.New(emptyLineErr)
-	}
 	command, err := e.findCommand()
 	if err != nil {
 		return "", err
@@ -113,6 +116,10 @@ func (e *Engine) Execute() (string, error) {
 }
 
 func (e *Engine) findCommand() (Command, error) {
+	if len(e.lexemes) == 0 {
+		return nil, errors.New(emptyLineErr)
+	}
+	
 	cmdToFound := e.lexemes[0]
 	for _, command := range commands {
 		if e.checkCommandName(cmdToFound, command) {
