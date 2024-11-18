@@ -9,7 +9,7 @@ type addTest struct {
 	expected []string
 }
 
-func testEq(a, b []string) bool {
+func compareSlices(a, b []string) bool {
     if len(a) != len(b) {
         return false
     }
@@ -26,7 +26,7 @@ var AnalyzeTests = []addTest{
     {"GET key", []string{"GET", "key"}},
     {"", []string{}},
     {"SET 31ke-as_asd_AS12 //unxi/sock.qas1", []string{"SET", "31ke-as_asd_AS12", "//unxi/sock.qas1"}},
-	}
+}
     
 
 func TestAnalyze(t *testing.T) {
@@ -35,10 +35,30 @@ func TestAnalyze(t *testing.T) {
 	for _, test := range AnalyzeTests{
 		lex.Analyze([]byte(test.arg1))
 		output := lex.GetLexemes()
-        if !testEq(output, test.expected) {
+        if !compareSlices(output, test.expected) {
             t.Errorf("Output %q not equal to expected %q", output, test.expected)
         }
 		lex.ClearLexer()
     }
 	
+}
+
+
+func TestCleanLexer(t *testing.T) {
+    lex := NewLex()
+
+    for _, test := range AnalyzeTests{
+		lex.Analyze([]byte(test.arg1))
+        lex.ClearLexer()
+        if !checkLexEmpty(lex) {
+            t.Errorf("Expected lex struct to be clean %+v", lex)   
+        }
+    }
+}
+
+func checkLexEmpty(lex *Lex) bool {
+    return  lex.buffer.Len() == 0 && 
+            lex.current_state == none && 
+            lex.new_state == none && 
+            len(lex.lexeme_list) == 0
 }
