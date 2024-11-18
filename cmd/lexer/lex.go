@@ -96,7 +96,7 @@ func (l *Lex) getStateMaker() worker {
 }
 
 func (l *Lex) ClearLexer() {
-	l.buffer = bytes.Buffer{}
+	l.buffer.Reset()
 	l.current_state = none
 	l.new_state = none
 	l.lexeme_list = l.lexeme_list[:0]
