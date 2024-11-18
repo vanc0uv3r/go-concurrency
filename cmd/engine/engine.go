@@ -137,5 +137,5 @@ func (e *Engine) checkCommandName(cmdToFound string, command Command) bool {
 
 func (e *Engine) checkCommandArgs(command Command) bool {
 	argsNum := command.getArgsNumber()
-	return argsNum == len(e.lexemes)-1
+	return argsNum == len(e.lexemes) - 1
 }
