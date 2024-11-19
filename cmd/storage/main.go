@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/vanc0uv3r/go-concurrency/cmd/lexer"
-	"github.com/vanc0uv3r/go-concurrency/cmd/engine"
+	"github.com/vanc0uv3r/go-concurrency/cmd/storage/lexer"
+	"github.com/vanc0uv3r/go-concurrency/cmd/storage/engine"
 )
 
 func main() {
