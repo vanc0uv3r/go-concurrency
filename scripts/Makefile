@@ -1,22 +1,28 @@
 ARCH ?= arm64
 OS ?= darwin
 PROJECT_PATH=$(realpath ../)
-STORAGE_PATH=cmd/storage
 BUILD_PATH=build
-STORAGE_BINARY=storage
-BINARY_NAME=storage
+
+GO_ENV = GOARCH=${ARCH} GOOS=${OS}
+BUILD_OUTPUT = ${PROJECT_PATH}/${BUILD_PATH}
+BUILD_MSG = @echo "Built Done: ${BUILD_OUTPUT}/$(@F)"
+START_MSG = @echo "Starting... ${BUILD_OUTPUT}/$(@F)"
+RUN_MSG = @echo "Dev Running... ${BUILD_OUTPUT}/$(@F)"
+
+# Targets
 
 $(BUILD_PATH):
 	mkdir -p ${PROJECT_PATH}/$(BUILD_PATH)
 
-build_storage: $(BUILD_PATH)
-	GOARCH=${ARCH} GOOS=${OS} go build -o ${PROJECT_PATH}/${BUILD_PATH}/${STORAGE_BINARY} ${PROJECT_PATH}/${STORAGE_PATH}
-	@echo "Built Done: ${PROJECT_PATH}/$(BUILD_DIR)/$(BINARY_NAME)"
 
-start_storage: 
-	${PROJECT_PATH}/${BUILD_PATH}/${STORAGE_BINARY}
-	@echo "Starting... ${PROJECT_PATH}/$(BUILD_DIR)/$(BINARY_NAME)"
+build_%: $(BUILD_PATH)
+	$(GO_ENV) go build -o ${BUILD_OUTPUT}/$* ${PROJECT_PATH}/cmd/$*
+	$(BUILD_MSG)
 
-run_storage: 
-	go run ${PROJECT_PATH}/${STORAGE_PATH}
-	@echo "Dev Running... ${PROJECT_PATH}/$(BUILD_DIR)/$(BINARY_NAME)"
+start_%:
+	${BUILD_OUTPUT}/$*
+	$(START_MSG)
+
+run_%:
+	go run ${PROJECT_PATH}/cmd/$*
+	$(RUN_MSG)
