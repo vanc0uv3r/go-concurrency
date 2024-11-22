@@ -1,7 +1,7 @@
 package main
 
 import (
-	"fmt"
+	"log"
 	"os"
 	"gopkg.in/yaml.v2"
 )
@@ -28,13 +28,13 @@ func importConfig() Config{
 	defaultConfig := NewConfig()
 	serverConfig, err := os.ReadFile("config/server.yaml")
 	if err != nil {
-		fmt.Println("Runnig with default params")
+		log.Println(defaultParamsMsg)
 		return defaultConfig
 	}
 	
 	err = yaml.Unmarshal(serverConfig, &fileConfig)
     if err != nil {
-		fmt.Println("Cant parse config. Use default")
+		log.Println(parseConfigErr)
 		return defaultConfig
     }
 
