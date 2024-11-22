@@ -25,10 +25,10 @@ type Get struct{ CommandDesc }
 type Del struct{ CommandDesc }
 
 
-func (s *Set) getName() string       { return s.name }
-func (s *Set) getArgsNumber() int    { return s.argsNum }
-func (s *Set) getArgs() []string     { return s.args }
-func (s *Set) setArgs(args []string) { s.args = args }
+func (cd *CommandDesc) getName() string       { return cd.name }
+func (cd *CommandDesc) getArgsNumber() int    { return cd.argsNum }
+func (cd *CommandDesc) getArgs() []string     { return cd.args }
+func (cd *CommandDesc) setArgs(args []string) { cd.args = args }
 
 func (s *Set) execute() (string, error) {
 	args := s.getArgs()
@@ -38,10 +38,6 @@ func (s *Set) execute() (string, error) {
 }
 
 
-func (g *Get) getName() string       { return g.name }
-func (g *Get) getArgsNumber() int    { return g.argsNum }
-func (g *Get) getArgs() []string     { return g.args }
-func (g *Get) setArgs(args []string) { g.args = args }
 
 func (g *Get) execute() (string, error) {
 	key := g.getArgs()[0]
@@ -53,10 +49,6 @@ func (g *Get) execute() (string, error) {
 	return "", errors.New(keyNotExistsErr)
 }
 
-func (d *Del) getName() string       { return d.name }
-func (d *Del) getArgsNumber() int    { return d.argsNum }
-func (d *Del) getArgs() []string     { return d.args }
-func (d *Del) setArgs(args []string) { d.args = args }
 
 func (d *Del) execute() (string, error) {
 	key := d.getArgs()[0]
