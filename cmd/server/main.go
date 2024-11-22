@@ -2,9 +2,11 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"net"
-	"github.com/vanc0uv3r/go-concurrency/cmd/storage/lexer"
+
 	"github.com/vanc0uv3r/go-concurrency/cmd/storage/engine"
+	"github.com/vanc0uv3r/go-concurrency/cmd/storage/lexer"
 )
 
 type Server struct {
@@ -28,23 +30,23 @@ func main() {
 
 	listener, err := net.Listen("tcp", listenerAddr)
 	if err != nil {
-		fmt.Printf("Cant listent server: %s", err.Error())
+		log.Fatal("Cant listent server: ", err.Error())
 	}
 
 	server := NewServer(listener, serverConfig)
+	log.Println("Ready to serve")
 	server.serve(listener)
 }
 
 func (s *Server) serve(l net.Listener) {
-	fmt.Println("Ready to serve")
 	for {
 		conn, err := l.Accept()
 		if err != nil {
-			fmt.Printf("Cant accept client: %s", err.Error())
+			log.Printf("Cant accept client: %s", err.Error())
 		}
 
 		if s.checkActiveConnectionsLimit() {
-			conn.Write([]byte("Too much conn\n"))
+			responseClient(conn, "Too much conn")
 			conn.Close()
 		}
 
@@ -60,29 +62,36 @@ func (s *Server) checkActiveConnectionsLimit() bool {
 func (s *Server) handleUser(conn net.Conn) {
 	s.activeConnections++
 	defer s.closeConn(conn)
+	log.Println("Got client")
+	
+	serveClient(conn)
+}
+
+func serveClient(conn net.Conn) {
+	var msgClient string
 	lex := lexer.NewLex()
 	engine := engine.NewEngine()
 
-	fmt.Println("Got client")
-	
 	buff := make([]byte, 1024)
 	for {
 		n, err := conn.Read(buff)
 		if err != nil {
-			fmt.Println(err.Error())
+			log.Println(err.Error())
 			break
 		}
-		fmt.Printf("REQUEST FROM CLIENT: %s", string(buff[:n]))
+		log.Printf("Request from client: %s\n", string(buff[:n]))
 
 		lex.Analyze(buff[:n])
-		engine.SetLexemes(lex.GetLexemes())
+		lexemes := lex.GetLexemes()
+		engine.SetLexemes(lexemes)
 		res, err := engine.Execute()
 
 		if err != nil {
-			fmt.Println(err.Error())
+			msgClient = fmt.Sprintf("Error while executing command: %s", err.Error())
 		} else {
-			fmt.Printf("result of %s operation: %s\n", engine.GetCommandName(), res)
+			msgClient = fmt.Sprintf("result of %s operation: %s\n", engine.GetCommandName(), res)
 		}
+		responseClient(conn, msgClient)
 		lex.ClearLexer()
 	}
 }
@@ -90,4 +99,12 @@ func (s *Server) handleUser(conn net.Conn) {
 func (s *Server) closeConn(conn net.Conn) {
 	s.activeConnections--
 	conn.Close()
+}
+
+func responseClient(conn net.Conn, msg string) {
+	bytesMsg := []byte(msg + "\n")
+	_, err := conn.Write(bytesMsg)
+	if err != nil {
+		log.Println("Error while sending response to client", err.Error())
+	}
 }
